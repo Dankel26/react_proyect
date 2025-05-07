@@ -1,0 +1,14 @@
+.about {
+ 
+    padding: 2rem;
+    background-color: #f5f5f5;
+    color: #333;
+  }
+  
+  .about h2 {
+    color: #007bff;
+  }
+  
+  .about p {
+    font-size: 1.1rem;
+  }
