@@ -1,12 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState} from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { OrbitControls } from 'three/examples/jsm/Addons.js'
-import './hero.css'
+import '../hero/hero'
 
 
 const ThreeScene = () => { // CREAR COMPOSICION PARA ANIMAR Y RENDERIZAR
   const mountRef = useRef<HTMLDivElement>(null); // tipado correcto
+   const [soundRef, setSoundRef] = useState<THREE.Audio | null>(null);
+   const [isPlaying, setIsPlaying] = useState(false);
+
+
 
   useEffect(() => {
     // if (!mountRef.current) return;  Validar que el contenedor no sea null
@@ -18,16 +22,18 @@ const ThreeScene = () => { // CREAR COMPOSICION PARA ANIMAR Y RENDERIZAR
 
     // Crear la escena, la cámara y el renderer
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x202020);
+    scene.background = new THREE.Color(0x202020); // <----- REVISAAAAAAR
+    // scene.fog = new THREE.Fog(0xff45f, 10, 15);
 
     // Cámara
     const camera = new THREE.PerspectiveCamera(
-      75,
+      60,
       mount.clientWidth / mount.clientHeight,
+      // window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    camera.position.z = 3; // la propiedad .position --> sirve para mover los elementos en diferentes planos x,y,z
+    camera.position.set(0, 1.5, 4); // la propiedad .position --> sirve para mover los elementos en diferentes planos x,y,z
 
     // Render
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -59,15 +65,26 @@ loader.load(
 
 
     // Luz
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
     directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
+    scene.add(directionalLight);    
+    
+    // AUDIOS formato optimizado para web .ogg
+    // create an AudioListener and add it to the camera
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
+
+  // create a global audio source
+    const sound = new THREE.Audio(listener);
+
 
     // Controles de órbita
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.minPolarAngle = Math.PI / 4;
+    controls.maxPolarAngle = Math.PI / 1.8;
 
 
     // Animación: Rotación básica en X
